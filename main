@@ -1,20 +1,22 @@
 import random
+from env import maze
+
 
 #hyper-parameters
 total_updates = int(1e4)
-policy_episodes = 1
-maze_dim = 5
-episode_horizon = 25
-num_policy = 4
-batch_size = 4
 train_per_step = 5
 
+policy_episodes = 1 # how many episodes we collect by following a policy
+maze_dim = 5
+episode_horizon = 25
+num_policy = 4 # how many most recent policies we use for update
+batch_size = 4
 
 state_space = maze_dim*maze_dim
 
 #learning rate
-sigma = np.sqrt(2*np.log(4)/(episode_horizon*episode_horizon*total_updates))
-eta = 100/np.sqrt(total_updates)
+sigma = np.sqrt(2*np.log(4)/(episode_horizon*episode_horizon*total_updates)) # policy update step size
+eta = 1/np.sqrt(total_updates) # reward update step size
 
 
 
