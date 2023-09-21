@@ -1,6 +1,8 @@
 import random
 from env import maze
-
+import utils
+import exp_demo
+from replay buffer import
 
 #hyper-parameters
 total_updates = int(1e4)
@@ -18,6 +20,20 @@ state_space = maze_dim*maze_dim
 sigma = np.sqrt(2*np.log(4)/(episode_horizon*episode_horizon*total_updates)) # policy update step size
 eta = 1/np.sqrt(total_updates) # reward update step size
 
+#
+num_exp_traj = 4
+exp_replay_buffer_list = []
+for h in range(episode_horizon):
+    exp_replay_buffer = ExperienceReplay(num_exp_traj)
+    exp_replay_buffer_list.append(exp_replay_buffer)
+for exp_traj in range(num_exp_traj):
+    env = maze(maze_dim, episode_horizon)
+    state = env.reset()
+    for step in range(episode_horizon):
+        action = exp_policy(state, maze_dim)
+        next_state, reward = env.step(action)
+        exp_replay_buffer_list[step].append((state, action))
+        state = next_state
 
 
 total_rewards_list_off_policy = []
