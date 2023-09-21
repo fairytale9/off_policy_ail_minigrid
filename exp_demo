@@ -11,17 +11,3 @@ def exp_policy(state, maze_dim):
     if column==maze_dim:
         action = 2
     return action
-
-num_exp_traj = 4
-exp_replay_buffer_list = []
-for h in range(episode_horizon):
-    exp_replay_buffer = ExperienceReplay(num_exp_traj)
-    exp_replay_buffer_list.append(exp_replay_buffer)
-for exp_traj in range(num_exp_traj):
-    env = maze(maze_dim, episode_horizon)
-    state = env.reset()
-    for step in range(episode_horizon):
-        action = exp_policy(state, maze_dim)
-        next_state, reward = env.step(action)
-        exp_replay_buffer_list[step].append((state, action))
-        state = next_state
