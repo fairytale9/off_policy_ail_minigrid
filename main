@@ -2,7 +2,8 @@ import random
 from env import maze
 import utils
 import exp_demo
-from replay buffer import
+from replay buffer import ExperienceReplay, TransitionReplay
+import numpy as np
 
 #hyper-parameters
 total_updates = int(1e4)
@@ -11,8 +12,10 @@ train_per_step = 5
 policy_episodes = 1 # how many episodes we collect by following a policy
 maze_dim = 5
 episode_horizon = 25
-num_policy = 4 # how many most recent policies we use for update
+num_policy = 4 # how many most recent policies we use for update, when num_policy=1, it is on-policy
 batch_size = 4
+num_exp_traj = 4 # amount of available expert data
+seeds = 5 # number of seeds
 
 state_space = maze_dim*maze_dim
 
@@ -20,8 +23,7 @@ state_space = maze_dim*maze_dim
 sigma = np.sqrt(2*np.log(4)/(episode_horizon*episode_horizon*total_updates)) # policy update step size
 eta = 1/np.sqrt(total_updates) # reward update step size
 
-#
-num_exp_traj = 4
+#get expert demonstrations
 exp_replay_buffer_list = []
 for h in range(episode_horizon):
     exp_replay_buffer = ExperienceReplay(num_exp_traj)
@@ -36,10 +38,9 @@ for exp_traj in range(num_exp_traj):
         state = next_state
 
 
-total_rewards_list_off_policy = []
-#total_rewards_list_on_policy_3 = []
+total_rewards_list = []
 
-for seed in range(1):
+for seed in range(seeds):
     random.seed(seed)
 
     #initialize policy
@@ -52,18 +53,18 @@ for seed in range(1):
 
     policy_list = np.array(policy_list)
 
-    #initialize replay buffer
+    #initialize behavior policy replay buffer
     policy_replay_buffer_list = []
 
     for h in range(episode_horizon):
         policy_replay_buffer = ExperienceReplay(policy_episodes*num_policy)
         policy_replay_buffer_list.append(policy_replay_buffer)
 
-    #initialize q value and reward function
+    #initialize q function and reward function
     q_value = np.zeros((episode_horizon+1,state_space,4), float)
     reward_function = np.zeros((episode_horizon, state_space*4), float)
 
-
+    #train
     k = 0
     total_rewards = np.zeros(total_updates)
     while(k<total_updates):
@@ -79,7 +80,7 @@ for seed in range(1):
                 action = np.random.choice([0,1,2,3], p=behavior_policy)
                 next_state, reward = env.step(action)
                 episode_reward += reward
-                #replay_buffer.add_batch((state, action, next_state))
+                #replay_buffer.add_batch((state, action, next_state)) #to estimate the world model, here we use the ground truth
                 policy_replay_buffer_list[step].append((state, action))
                 state = next_state
 
@@ -133,8 +134,5 @@ for seed in range(1):
                     reward_function[step] = new_reward
 
         k += 1
-        if k%2e3 == 0:
-            print(k)
 
-    total_rewards_list_off_policy.append(total_rewards)
-    #total_rewards_list_on_policy_3.append(total_rewards)
+    total_rewards_list.append(total_rewards)
