@@ -1,2 +1,2 @@
-# ail_minigrid
-off policy versus on policy
+# off_policy_ail_minigrid
+This repository implements off-policy adversarial imitation learning on [Minigrid](https://github.com/Farama-Foundation/Minigrid) EmptyRoom tasks.
