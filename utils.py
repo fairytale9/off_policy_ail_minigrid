@@ -1,12 +1,14 @@
 import numpy as np
 
-def state_action_encoder(states, actions, state_space, batch_size):
-    state_action_rep = np.zeros((batch_size, state_space*4), dtype=int)
+def state_action_encoder(states, actions, state_space, batch_size, feature_encoder, feature_space):
+    state_action_rep = np.zeros((batch_size, feature_space), dtype=float)
     for idx in range(batch_size):
         state = states[idx]
         action = actions[idx]
-        _state_action_rep = np.zeros(state_space*4, dtype=int)
-        _state_action_rep[state*4+action] = 1 # one-hot representation of state action pairs
+        _state_action_rep = np.zeros(state_space+4, dtype=float)
+        _state_action_rep[state_space+action] = 1
+        _state_action_rep[state] = 1
+        _state_action_rep = np.dot(_state_action_rep, feature_encoder)
         state_action_rep[idx, :] = _state_action_rep
     return state_action_rep
 
