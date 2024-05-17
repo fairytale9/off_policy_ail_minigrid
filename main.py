@@ -11,8 +11,8 @@ from tqdm import tqdm, trange
 #hyper-parameters
 total_steps = int(1e4) #total episodes between agent and env
 replay_buffer_size = 128
-maze_dim = 3
-episode_horizon = 9
+maze_dim = 3 #set 3, 5, 9 
+episode_horizon = maze_dim*3
 batch_size = 32
 train_per_step = 4
 feature_space = 8
@@ -155,5 +155,5 @@ for num_recent_policies in [1, 4, 32, 128]:
                           new_reward = np.clip(_new_reward, -1, 1)
                           reward_function[step] = new_reward
 
-      log_filename = os.path.join('/content/minigrid_results_S_3/', 'Maze_'+str(maze_dim)+'H_'+str(episode_horizon)+'N_'+str(num_recent_policies)+'seed_'+str(seed))
+      log_filename = os.path.join('/content/minigrid_results/', 'Maze_'+str(maze_dim)+'H_'+str(episode_horizon)+'N_'+str(num_recent_policies)+'seed_'+str(seed))
       np.save(log_filename, eval_rewards)
